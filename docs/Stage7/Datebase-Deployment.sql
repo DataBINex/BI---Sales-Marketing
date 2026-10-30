@@ -696,24 +696,6 @@ ELSE
     PRINT N'Table sales.SalesForecast already exists - skipped.';
 GO
 
-/* ---- Summary of Team 1 objects ---- */
-DECLARE @t TABLE (object_id int PRIMARY KEY);
-INSERT @t (object_id)
-SELECT OBJECT_ID(n) FROM (VALUES (N'ref.Province'), (N'ref.City'), (N'ref.CustomerSegment'), (N'ref.SalesChannel'), (N'ref.SalesRegion'), (N'ref.SalesTerritory'), (N'core.Calendar'), (N'core.Branch'), (N'core.Salesperson'), (N'core.Customer'), (N'sales.Lead'), (N'sales.CustomerInteraction'), (N'sales.SalesOpportunity'), (N'sales.Contract'), (N'sales.SalesOrder'), (N'sales.SalesOrderItem'), (N'sales.Invoice'), (N'sales.InvoiceItem'), (N'sales.Payment'), (N'sales.ReturnRequest'), (N'sales.CustomerFeedback'), (N'sales.Commission'), (N'sales.SalesTarget'), (N'sales.SalesForecast')) v(n) WHERE OBJECT_ID(n) IS NOT NULL;
-DECLARE @msg nvarchar(600) = CONCAT(
-    N'Team 1 objects now in FoodDistributionDB: tables ', (SELECT COUNT(*) FROM @t),
-    N', columns ', (SELECT COUNT(*) FROM sys.columns c JOIN @t t ON t.object_id = c.object_id),
-    N', PK ', (SELECT COUNT(*) FROM sys.key_constraints k JOIN @t t ON t.object_id = k.parent_object_id WHERE k.type = 'PK'),
-    N', UNIQUE ', (SELECT COUNT(*) FROM sys.key_constraints k JOIN @t t ON t.object_id = k.parent_object_id WHERE k.type = 'UQ')
-                + (SELECT COUNT(*) FROM sys.indexes i JOIN @t t ON t.object_id = i.object_id WHERE i.is_unique = 1 AND i.has_filter = 1),
-    N', CHECK ', (SELECT COUNT(*) FROM sys.check_constraints k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', DEFAULT ', (SELECT COUNT(*) FROM sys.default_constraints k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', FK ', (SELECT COUNT(*) FROM sys.foreign_keys k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', indexes ', (SELECT COUNT(*) FROM sys.indexes i JOIN @t t ON t.object_id = i.object_id WHERE i.type = 2 AND i.is_unique = 0),
-    N'.');
-PRINT @msg;
-GO
-
 SET NOEXEC OFF;
 GO
 PRINT N'07-Team1-01-Create-Tables.sql finished.';
@@ -2332,24 +2314,6 @@ BEGIN
         PRINT N'Created FK_SalesTarget_Product_Product_ID.';
     END
 END
-GO
-
-/* ---- Summary of Team 1 objects ---- */
-DECLARE @t TABLE (object_id int PRIMARY KEY);
-INSERT @t (object_id)
-SELECT OBJECT_ID(n) FROM (VALUES (N'ref.Province'), (N'ref.City'), (N'ref.CustomerSegment'), (N'ref.SalesChannel'), (N'ref.SalesRegion'), (N'ref.SalesTerritory'), (N'core.Calendar'), (N'core.Branch'), (N'core.Salesperson'), (N'core.Customer'), (N'sales.Lead'), (N'sales.CustomerInteraction'), (N'sales.SalesOpportunity'), (N'sales.Contract'), (N'sales.SalesOrder'), (N'sales.SalesOrderItem'), (N'sales.Invoice'), (N'sales.InvoiceItem'), (N'sales.Payment'), (N'sales.ReturnRequest'), (N'sales.CustomerFeedback'), (N'sales.Commission'), (N'sales.SalesTarget'), (N'sales.SalesForecast')) v(n) WHERE OBJECT_ID(n) IS NOT NULL;
-DECLARE @msg nvarchar(600) = CONCAT(
-    N'Team 1 objects now in FoodDistributionDB: tables ', (SELECT COUNT(*) FROM @t),
-    N', columns ', (SELECT COUNT(*) FROM sys.columns c JOIN @t t ON t.object_id = c.object_id),
-    N', PK ', (SELECT COUNT(*) FROM sys.key_constraints k JOIN @t t ON t.object_id = k.parent_object_id WHERE k.type = 'PK'),
-    N', UNIQUE ', (SELECT COUNT(*) FROM sys.key_constraints k JOIN @t t ON t.object_id = k.parent_object_id WHERE k.type = 'UQ')
-                + (SELECT COUNT(*) FROM sys.indexes i JOIN @t t ON t.object_id = i.object_id WHERE i.is_unique = 1 AND i.has_filter = 1),
-    N', CHECK ', (SELECT COUNT(*) FROM sys.check_constraints k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', DEFAULT ', (SELECT COUNT(*) FROM sys.default_constraints k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', FK ', (SELECT COUNT(*) FROM sys.foreign_keys k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', indexes ', (SELECT COUNT(*) FROM sys.indexes i JOIN @t t ON t.object_id = i.object_id WHERE i.type = 2 AND i.is_unique = 0),
-    N'.');
-PRINT @msg;
 GO
 
 SET NOEXEC OFF;
@@ -4681,24 +4645,6 @@ GO
 -- FK_SalesTarget_Product_Product_ID
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_SalesTarget_Product_ID' AND object_id = OBJECT_ID(N'sales.SalesTarget'))
     CREATE NONCLUSTERED INDEX IX_SalesTarget_Product_ID ON sales.SalesTarget (Product_ID) WHERE Product_ID IS NOT NULL;
-GO
-
-/* ---- Summary of Team 1 objects ---- */
-DECLARE @t TABLE (object_id int PRIMARY KEY);
-INSERT @t (object_id)
-SELECT OBJECT_ID(n) FROM (VALUES (N'ref.Province'), (N'ref.City'), (N'ref.CustomerSegment'), (N'ref.SalesChannel'), (N'ref.SalesRegion'), (N'ref.SalesTerritory'), (N'core.Calendar'), (N'core.Branch'), (N'core.Salesperson'), (N'core.Customer'), (N'sales.Lead'), (N'sales.CustomerInteraction'), (N'sales.SalesOpportunity'), (N'sales.Contract'), (N'sales.SalesOrder'), (N'sales.SalesOrderItem'), (N'sales.Invoice'), (N'sales.InvoiceItem'), (N'sales.Payment'), (N'sales.ReturnRequest'), (N'sales.CustomerFeedback'), (N'sales.Commission'), (N'sales.SalesTarget'), (N'sales.SalesForecast')) v(n) WHERE OBJECT_ID(n) IS NOT NULL;
-DECLARE @msg nvarchar(600) = CONCAT(
-    N'Team 1 objects now in FoodDistributionDB: tables ', (SELECT COUNT(*) FROM @t),
-    N', columns ', (SELECT COUNT(*) FROM sys.columns c JOIN @t t ON t.object_id = c.object_id),
-    N', PK ', (SELECT COUNT(*) FROM sys.key_constraints k JOIN @t t ON t.object_id = k.parent_object_id WHERE k.type = 'PK'),
-    N', UNIQUE ', (SELECT COUNT(*) FROM sys.key_constraints k JOIN @t t ON t.object_id = k.parent_object_id WHERE k.type = 'UQ')
-                + (SELECT COUNT(*) FROM sys.indexes i JOIN @t t ON t.object_id = i.object_id WHERE i.is_unique = 1 AND i.has_filter = 1),
-    N', CHECK ', (SELECT COUNT(*) FROM sys.check_constraints k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', DEFAULT ', (SELECT COUNT(*) FROM sys.default_constraints k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', FK ', (SELECT COUNT(*) FROM sys.foreign_keys k JOIN @t t ON t.object_id = k.parent_object_id),
-    N', indexes ', (SELECT COUNT(*) FROM sys.indexes i JOIN @t t ON t.object_id = i.object_id WHERE i.type = 2 AND i.is_unique = 0),
-    N'.');
-PRINT @msg;
 GO
 
 SET NOEXEC OFF;
