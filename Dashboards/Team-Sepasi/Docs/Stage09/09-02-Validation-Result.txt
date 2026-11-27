@@ -1,0 +1,174 @@
+﻿## Check_Group | Object_Name | Check_Name | Expected | Actual | Result
+V1 | Fact_SalesOrderLine | Row count = sales.SalesOrderItem | 240551.00 | 240551.00 | PASS
+V1 | Fact_Invoice | Row count = sales.Invoice | 51691.00 | 51691.00 | PASS
+V1 | Fact_InvoiceLine | Row count = sales.InvoiceItem | 207226.00 | 207226.00 | PASS
+V1 | Fact_Payment | Row count = sales.Payment | 50981.00 | 50981.00 | PASS
+V1 | Fact_Return | Row count = sales.ReturnRequest | 5768.00 | 5768.00 | PASS
+V1 | Fact_SalesTarget | Row count = sales.SalesTarget | 8928.00 | 8928.00 | PASS
+V1 | Fact_SalesForecast | Row count = sales.SalesForecast | 276.00 | 276.00 | PASS
+V1 | Fact_Commission | Row count = sales.Commission | 7796.00 | 7796.00 | PASS
+V1 | Fact_Lead | Row count = sales.Lead | 4000.00 | 4000.00 | PASS
+V1 | Fact_Opportunity | Row count = sales.SalesOpportunity | 6000.00 | 6000.00 | PASS
+V1 | Fact_Contract | Row count = sales.Contract | 500.00 | 500.00 | PASS
+V1 | Fact_CustomerInteraction | Row count = sales.CustomerInteraction | 30000.00 | 30000.00 | PASS
+V1 | Fact_CustomerFeedback | Row count = sales.CustomerFeedback | 4936.00 | 4936.00 | PASS
+V1 | Fact_CampaignBudget | Row count = marketing.CampaignBudget | 271.00 | 271.00 | PASS
+V1 | Fact_CampaignCost | Row count = marketing.CampaignCost | 1570.00 | 1570.00 | PASS
+V1 | Fact_CampaignResult | Row count = marketing.CampaignResult | 2902.00 | 2902.00 | PASS
+V1 | Fact_BrandActivity | Row count = marketing.BrandActivity | 480.00 | 480.00 | PASS
+V1 | Fact_ProductPrice | Row count = marketing.ProductPrice | 5891.00 | 5891.00 | PASS
+V1 | Fact_MarketPrice | Row count = marketing.MarketPrice | 27021.00 | 27021.00 | PASS
+V1 | Fact_MarketResearch | Row count = marketing.MarketResearch | 40.00 | 40.00 | PASS
+V1 | Fact_MarketSurvey | Row count = marketing.MarketSurvey | 81.00 | 81.00 | PASS
+V1 | Bridge_CampaignAudience | Row count = marketing.MarketingCampaignAudience | 198.00 | 198.00 | PASS
+V2 | Dim_Date | Row count = core.Calendar | 2803.00 | 2803.00 | PASS
+V3 | Dim_Date | Key DateKey is unique | 2803.00 | 2803.00 | PASS
+V2 | Dim_Customer | Row count = core.Customer + 1 unknown | 5001.00 | 5001.00 | PASS
+V3 | Dim_Customer | Key Customer_Key is unique | 5001.00 | 5001.00 | PASS
+V2 | Dim_Salesperson | Row count = core.Salesperson + 1 unknown | 121.00 | 121.00 | PASS
+V3 | Dim_Salesperson | Key Salesperson_Key is unique | 121.00 | 121.00 | PASS
+V2 | Dim_SalesRegion | Row count = ref.SalesRegion + 1 unknown | 11.00 | 11.00 | PASS
+V3 | Dim_SalesRegion | Key SalesRegion_Key is unique | 11.00 | 11.00 | PASS
+V2 | Dim_SalesChannel | Row count = ref.SalesChannel + 1 unknown | 7.00 | 7.00 | PASS
+V3 | Dim_SalesChannel | Key SalesChannel_Key is unique | 7.00 | 7.00 | PASS
+V2 | Dim_Product | Row count = core.Product + 1 unknown | 201.00 | 201.00 | PASS
+V3 | Dim_Product | Key Product_Key is unique | 201.00 | 201.00 | PASS
+V2 | Dim_SKU | Row count = core.SKU | 379.00 | 379.00 | PASS
+V3 | Dim_SKU | Key SKU_Key is unique | 379.00 | 379.00 | PASS
+V2 | Dim_Brand | Row count = core.Brand | 10.00 | 10.00 | PASS
+V3 | Dim_Brand | Key Brand_Key is unique | 10.00 | 10.00 | PASS
+V2 | Dim_Campaign | Row count = marketing.MarketingCampaign | 92.00 | 92.00 | PASS
+V3 | Dim_Campaign | Key Campaign_Key is unique | 92.00 | 92.00 | PASS
+V2 | Dim_CampaignChannel | Row count = marketing.CampaignChannel + 1 unknown | 9.00 | 9.00 | PASS
+V3 | Dim_CampaignChannel | Key CampaignChannel_Key is unique | 9.00 | 9.00 | PASS
+V2 | Dim_CampaignAudience | Row count = marketing.CampaignAudience | 10.00 | 10.00 | PASS
+V3 | Dim_CampaignAudience | Key CampaignAudience_Key is unique | 10.00 | 10.00 | PASS
+V2 | Dim_Promotion | Row count = marketing.Promotion + 1 unknown | 321.00 | 321.00 | PASS
+V3 | Dim_Promotion | Key Promotion_Key is unique | 321.00 | 321.00 | PASS
+V2 | Dim_Market | Row count = marketing.Market | 8.00 | 8.00 | PASS
+V3 | Dim_Market | Key Market_Key is unique | 8.00 | 8.00 | PASS
+V2 | Dim_MarketSegment | Row count = marketing.MarketSegment + 1 unknown | 25.00 | 25.00 | PASS
+V3 | Dim_MarketSegment | Key MarketSegment_Key is unique | 25.00 | 25.00 | PASS
+V2 | Dim_Competitor | Row count = marketing.Competitor | 15.00 | 15.00 | PASS
+V3 | Dim_Competitor | Key Competitor_Key is unique | 15.00 | 15.00 | PASS
+V2 | Dim_CompetitorProduct | Row count = marketing.CompetitorProduct + 1 unknown | 85.00 | 85.00 | PASS
+V3 | Dim_CompetitorProduct | Key CompetitorProduct_Key is unique | 85.00 | 85.00 | PASS
+V4 | Bridge_CampaignAudience | No orphan/NULL Campaign_Key (-> Dim_Campaign) | 0.00 | 0.00 | PASS
+V4 | Bridge_CampaignAudience | No orphan/NULL CampaignAudience_Key (-> Dim_CampaignAudience) | 0.00 | 0.00 | PASS
+V4 | Fact_BrandActivity | No orphan/NULL Brand_Key (-> Dim_Brand) | 0.00 | 0.00 | PASS
+V4 | Fact_CampaignBudget | No orphan/NULL Campaign_Key (-> Dim_Campaign) | 0.00 | 0.00 | PASS
+V4 | Fact_CampaignBudget | No orphan/NULL CampaignChannel_Key (-> Dim_CampaignChannel) | 0.00 | 0.00 | PASS
+V4 | Fact_CampaignCost | No orphan/NULL Campaign_Key (-> Dim_Campaign) | 0.00 | 0.00 | PASS
+V4 | Fact_CampaignCost | No orphan/NULL CampaignChannel_Key (-> Dim_CampaignChannel) | 0.00 | 0.00 | PASS
+V4 | Fact_CampaignResult | No orphan/NULL Campaign_Key (-> Dim_Campaign) | 0.00 | 0.00 | PASS
+V4 | Fact_Commission | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_Contract | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_Contract | No orphan/NULL Product_Key (-> Dim_Product) | 0.00 | 0.00 | PASS
+V4 | Fact_CustomerFeedback | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_CustomerFeedback | No orphan/NULL Product_Key (-> Dim_Product) | 0.00 | 0.00 | PASS
+V4 | Fact_CustomerInteraction | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_CustomerInteraction | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_Invoice | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_Invoice | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_Invoice | No orphan/NULL SalesChannel_Key (-> Dim_SalesChannel) | 0.00 | 0.00 | PASS
+V4 | Fact_Invoice | No orphan/NULL SalesRegion_Key (-> Dim_SalesRegion) | 0.00 | 0.00 | PASS
+V4 | Fact_Invoice | No orphan/NULL Promotion_Key (-> Dim_Promotion) | 0.00 | 0.00 | PASS
+V4 | Fact_InvoiceLine | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_InvoiceLine | No orphan/NULL Product_Key (-> Dim_Product) | 0.00 | 0.00 | PASS
+V4 | Fact_InvoiceLine | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_InvoiceLine | No orphan/NULL SalesChannel_Key (-> Dim_SalesChannel) | 0.00 | 0.00 | PASS
+V4 | Fact_InvoiceLine | No orphan/NULL SalesRegion_Key (-> Dim_SalesRegion) | 0.00 | 0.00 | PASS
+V4 | Fact_InvoiceLine | No orphan/NULL Promotion_Key (-> Dim_Promotion) | 0.00 | 0.00 | PASS
+V4 | Fact_Lead | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_MarketPrice | No orphan/NULL Product_Key (-> Dim_Product) | 0.00 | 0.00 | PASS
+V4 | Fact_MarketPrice | No orphan/NULL CompetitorProduct_Key (-> Dim_CompetitorProduct) | 0.00 | 0.00 | PASS
+V4 | Fact_MarketPrice | No orphan/NULL Market_Key (-> Dim_Market) | 0.00 | 0.00 | PASS
+V4 | Fact_MarketResearch | No orphan/NULL Market_Key (-> Dim_Market) | 0.00 | 0.00 | PASS
+V4 | Fact_MarketSurvey | No orphan/NULL Market_Key (-> Dim_Market) | 0.00 | 0.00 | PASS
+V4 | Fact_MarketSurvey | No orphan/NULL MarketSegment_Key (-> Dim_MarketSegment) | 0.00 | 0.00 | PASS
+V4 | Fact_Opportunity | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_Opportunity | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_Payment | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_Payment | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_Payment | No orphan/NULL SalesChannel_Key (-> Dim_SalesChannel) | 0.00 | 0.00 | PASS
+V4 | Fact_Payment | No orphan/NULL SalesRegion_Key (-> Dim_SalesRegion) | 0.00 | 0.00 | PASS
+V4 | Fact_ProductPrice | No orphan/NULL SKU_Key (-> Dim_SKU) | 0.00 | 0.00 | PASS
+V4 | Fact_ProductPrice | No orphan/NULL Product_Key (-> Dim_Product) | 0.00 | 0.00 | PASS
+V4 | Fact_Return | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_Return | No orphan/NULL Product_Key (-> Dim_Product) | 0.00 | 0.00 | PASS
+V4 | Fact_Return | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_Return | No orphan/NULL SalesChannel_Key (-> Dim_SalesChannel) | 0.00 | 0.00 | PASS
+V4 | Fact_Return | No orphan/NULL SalesRegion_Key (-> Dim_SalesRegion) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesOrderLine | No orphan/NULL Customer_Key (-> Dim_Customer) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesOrderLine | No orphan/NULL Product_Key (-> Dim_Product) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesOrderLine | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesOrderLine | No orphan/NULL SalesChannel_Key (-> Dim_SalesChannel) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesOrderLine | No orphan/NULL SalesRegion_Key (-> Dim_SalesRegion) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesOrderLine | No orphan/NULL Promotion_Key (-> Dim_Promotion) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesTarget | No orphan/NULL SalesRegion_Key (-> Dim_SalesRegion) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesTarget | No orphan/NULL Salesperson_Key (-> Dim_Salesperson) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesTarget | No orphan/NULL SalesChannel_Key (-> Dim_SalesChannel) | 0.00 | 0.00 | PASS
+V4 | Fact_SalesTarget | No orphan/NULL Product_Key (-> Dim_Product) | 0.00 | 0.00 | PASS
+V5 | Fact_BrandActivity | No orphan StartDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_BrandActivity | No orphan EndDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_CampaignBudget | No orphan ApprovalDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_CampaignCost | No orphan CostDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_CampaignResult | No orphan MeasurementDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Commission | No orphan PeriodEndDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Contract | No orphan StartDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Contract | No orphan EndDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Contract | No orphan ClosedDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_CustomerFeedback | No orphan FeedbackDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_CustomerFeedback | No orphan ResolutionDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_CustomerInteraction | No orphan InteractionDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_CustomerInteraction | No orphan FollowUpDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Invoice | No orphan InvoiceDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Invoice | No orphan DueDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_InvoiceLine | No orphan InvoiceDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Lead | No orphan CreatedDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Lead | No orphan ConversionDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_MarketPrice | No orphan PriceDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_MarketResearch | No orphan StartDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_MarketResearch | No orphan EndDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_MarketSurvey | No orphan SurveyDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Opportunity | No orphan OpportunityDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Opportunity | No orphan ExpectedCloseDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Opportunity | No orphan ProposalDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Payment | No orphan PaymentDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_ProductPrice | No orphan EffectiveFromDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_ProductPrice | No orphan EffectiveToDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Return | No orphan ReturnDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_Return | No orphan RefundDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_SalesForecast | No orphan PeriodEndDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_SalesOrderLine | No orphan OrderDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_SalesOrderLine | No orphan DeliveryDateKey | 0.00 | 0.00 | PASS
+V5 | Fact_SalesTarget | No orphan PeriodEndDateKey | 0.00 | 0.00 | PASS
+V6 | Fact_SalesOrderLine | SUM(Net_Amount) = sales.SalesOrderItem | 14647621328875.00 | 14647621328875.00 | PASS
+V6 | Fact_SalesOrderLine | SUM(Quantity) = sales.SalesOrderItem | 12159682.00 | 12159682.00 | PASS
+V6 | Fact_Invoice | SUM(Total_Amount) = sales.Invoice | 13163469385751.00 | 13163469385751.00 | PASS
+V6 | Fact_Invoice | SUM(Subtotal) = sales.Invoice | 12590602056180.00 | 12590602056180.00 | PASS
+V6 | Fact_Invoice | SUM(Paid_Amount) = sales.Payment WHERE Invoice_ID IS NOT NULL AND Payment_Status = N'Successful' | 9864349009520.00 | 9864349009520.00 | PASS
+V6 | Fact_Invoice | SUM(Tax_Amount) = sales.Invoice | 681085862430.00 | 681085862430.00 | PASS
+V6 | Fact_Invoice | SUM(Discount_Amount) = sales.Invoice | 108218532859.00 | 108218532859.00 | PASS
+V6 | Fact_InvoiceLine | SUM(Final_Amount) = sales.InvoiceItem | 13163469385751.00 | 13163469385751.00 | PASS
+V6 | Fact_InvoiceLine | SUM(Net_Amount) = sales.InvoiceItem | 12482383523321.00 | 12482383523321.00 | PASS
+V6 | Fact_Payment | SUM(Amount) = sales.Payment | 10229205044015.00 | 10229205044015.00 | PASS
+V6 | Fact_Return | SUM(Refund_Amount) = sales.ReturnRequest | 77424648689.00 | 77424648689.00 | PASS
+V6 | Fact_SalesTarget | SUM(Target_Value) = sales.SalesTarget | 71082734683042.00 | 71082734683042.00 | PASS
+V6 | Fact_SalesForecast | SUM(Forecast_Amount) = sales.SalesForecast | 39171539900191.00 | 39171539900191.00 | PASS
+V6 | Fact_Commission | SUM(Commission_Amount) = sales.Commission | 371566775305.00 | 371566775305.00 | PASS
+V6 | Fact_Opportunity | SUM(Expected_Value) = sales.SalesOpportunity | 179250000000.00 | 179250000000.00 | PASS
+V6 | Fact_Contract | SUM(Contract_Amount) = sales.Contract | 17375000000.00 | 17375000000.00 | PASS
+V6 | Fact_CampaignBudget | SUM(Total_Allocated_Amount) = marketing.CampaignBudget | 2414089000000.00 | 2414089000000.00 | PASS
+V6 | Fact_CampaignCost | SUM(Actual_Spent) = marketing.CampaignCost | 2014462354000.00 | 2014462354000.00 | PASS
+V6 | Fact_BrandActivity | SUM(Activity_Cost) = marketing.BrandActivity | 11830136144.00 | 11830136144.00 | PASS
+V6 | Fact_MarketResearch | SUM(Research_Cost) = marketing.MarketResearch | 144102000000.00 | 144102000000.00 | PASS
+V6 | Fact_MarketSurvey | SUM(Sample_Size) = marketing.MarketSurvey | 42679.00 | 42679.00 | PASS
+V7 | Fact_Invoice / Fact_InvoiceLine | Invoices where |Total_Amount - SUM(line Final_Amount)| > 1 | 0.00 | 0.00 | PASS
+V8 | rpt.* | No personal / free-text column in any view | 0.00 | 0.00 | PASS
+V9 | rpt | 38 views (16 Dim, 21 Fact, 1 Bridge) | 38.00 | 38.00 | PASS
+I1 | sales.SalesOpportunity | Expected_Close_Date outside calendar (date key left NULL, raw date kept) | NULL | 365.00 | INFO
+## Result | Checks
+INFO | 1
+PASS | 168
+== batches: 1, errors: 0

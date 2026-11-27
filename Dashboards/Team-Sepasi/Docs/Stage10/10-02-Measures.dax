@@ -1,0 +1,525 @@
+﻿// FOOD DISTRIBUTION BI - STAGE 10 - DAX MEASURES (table _Measures)
+// 109 measures. Same text as the TMDL model in Stage12. Generated from one catalogue.
+
+
+// ==================== 01 فروش ====================
+// مبلغ فروش | جمع مبلغ نهایی فاکتورها (با مالیات و پس از تخفیف). مبنای مقایسه با تارگت. | format: #,0
+[Sales Amount] =
+SUM ( Fact_Invoice[Total_Amount] )
+
+// مبلغ ناخالص فاکتور | جمع Subtotal فاکتورها (پیش از تخفیف و مالیات). | format: #,0
+[Sales Subtotal] =
+SUM ( Fact_Invoice[Subtotal] )
+
+// مبلغ تخفیف | جمع تخفیف فاکتورها. | format: #,0
+[Discount Amount] =
+SUM ( Fact_Invoice[Discount_Amount] )
+
+// درصد تخفیف | تخفیف ÷ مبلغ ناخالص. | format: 0.0%
+[Discount %] =
+DIVIDE ( [Discount Amount], [Sales Subtotal] )
+
+// مالیات | جمع مالیات فاکتورها. | format: #,0
+[Tax Amount] =
+SUM ( Fact_Invoice[Tax_Amount] )
+
+// تعداد فاکتور | تعداد فاکتورها. | format: #,0
+[Invoice Count] =
+COUNTROWS ( Fact_Invoice )
+
+// میانگین مبلغ فاکتور | مبلغ فروش ÷ تعداد فاکتور (AOV). | format: #,0
+[Avg Invoice Value] =
+DIVIDE ( [Sales Amount], [Invoice Count] )
+
+// مبلغ فروش محصول | جمع مبلغ ردیف‌های فاکتور. فقط برای تحلیل محصول؛ با Sales Amount در یک Visual جمع نشود. | format: #,0
+[Product Sales Amount] =
+SUM ( Fact_InvoiceLine[Final_Amount] )
+
+// تعداد کالای فروخته‌شده | جمع تعداد ردیف‌های فاکتور. | format: #,0
+[Quantity Sold] =
+SUM ( Fact_InvoiceLine[Quantity] )
+
+// تعداد سفارش | تعداد سفارش‌های ثبت‌شده (همه وضعیت‌ها). | format: #,0
+[Order Count] =
+DISTINCTCOUNT ( Fact_SalesOrderLine[Sales_Order_ID] )
+
+// تعداد سفارش لغوشده | سفارش‌های با وضعیت Cancelled. | format: #,0
+[Cancelled Order Count] =
+CALCULATE ( [Order Count], Fact_SalesOrderLine[Order_Status] = "Cancelled" )
+
+// نرخ لغو سفارش | سفارش لغوشده ÷ کل سفارش. | format: 0.0%
+[Order Cancellation %] =
+DIVIDE ( [Cancelled Order Count], [Order Count] )
+
+// سهم از کل فروش | سهم هر ردیف Visual (منطقه، کانال، مشتری...) از کل فروش انتخاب‌شده. | format: 0.0%
+[Sales Share %] =
+DIVIDE ( [Sales Amount], CALCULATE ( [Sales Amount], ALLSELECTED () ) )
+
+// سهم محصول از فروش | سهم محصول/دسته/برند از کل فروش محصولات انتخاب‌شده. | format: 0.0%
+[Product Sales Share %] =
+DIVIDE ( [Product Sales Amount], CALCULATE ( [Product Sales Amount], ALLSELECTED ( Dim_Product ) ) )
+
+
+// ==================== 02 زمان شمسی ====================
+// فروش از ابتدای ماه شمسی | فروش از اول ماه شمسی تا آخرین روز انتخاب‌شده. | format: #,0
+[Sales MTD] =
+VAR d = MAX ( Dim_Date[Date] )
+VAR ym = CALCULATE ( MAX ( Dim_Date[PersianYearMonthKey] ), REMOVEFILTERS ( Dim_Date ), Dim_Date[Date] = d )
+RETURN
+    CALCULATE ( [Sales Amount], REMOVEFILTERS ( Dim_Date ), Dim_Date[PersianYearMonthKey] = ym, Dim_Date[Date] <= d )
+
+// فروش از ابتدای فصل شمسی | فروش از اول فصل شمسی تا آخرین روز انتخاب‌شده. | format: #,0
+[Sales QTD] =
+VAR d = MAX ( Dim_Date[Date] )
+VAR yq = CALCULATE ( MAX ( Dim_Date[PersianYearQuarterKey] ), REMOVEFILTERS ( Dim_Date ), Dim_Date[Date] = d )
+RETURN
+    CALCULATE ( [Sales Amount], REMOVEFILTERS ( Dim_Date ), Dim_Date[PersianYearQuarterKey] = yq, Dim_Date[Date] <= d )
+
+// فروش از ابتدای سال شمسی | فروش از اول فروردین تا آخرین روز انتخاب‌شده. | format: #,0
+[Sales YTD] =
+VAR d = MAX ( Dim_Date[Date] )
+VAR y = CALCULATE ( MAX ( Dim_Date[PersianYear] ), REMOVEFILTERS ( Dim_Date ), Dim_Date[Date] = d )
+RETURN
+    CALCULATE ( [Sales Amount], REMOVEFILTERS ( Dim_Date ), Dim_Date[PersianYear] = y, Dim_Date[Date] <= d )
+
+// فروش دوره مشابه سال قبل | همان روزهای شمسی انتخاب‌شده در سال قبل. اگر ۲۹ اسفند انتخاب شده باشد، ۳۰ اسفند سال قبلِ کبیسه هم حساب می‌شود. | format: #,0
+[Sales PY] =
+VAR k = SELECTCOLUMNS ( VALUES ( Dim_Date[PersianDateKey] ), "k", Dim_Date[PersianDateKey] - 10000 )
+VAR leap = SELECTCOLUMNS ( FILTER ( VALUES ( Dim_Date[PersianDateKey] ), MOD ( Dim_Date[PersianDateKey], 10000 ) = 1229 ),
+                           "k", Dim_Date[PersianDateKey] - 10000 + 1 )
+RETURN
+    CALCULATE ( [Sales Amount], REMOVEFILTERS ( Dim_Date ), TREATAS ( UNION ( k, leap ), Dim_Date[PersianDateKey] ) )
+
+// رشد سال به سال | (فروش دوره − فروش دوره مشابه سال قبل) ÷ فروش سال قبل. در ۱۳۹۸ خالی است. | format: 0.0%
+[Sales YoY %] =
+DIVIDE ( [Sales Amount] - [Sales PY], [Sales PY] )
+
+// فروش سال قبل تا همین روز | فروش سال قبل از اول فروردین تا همان روز سال (روز چندم سال). | format: #,0
+[Sales PY YTD] =
+VAR d = MAX ( Dim_Date[Date] )
+VAR r = CALCULATETABLE ( Dim_Date, REMOVEFILTERS ( Dim_Date ), Dim_Date[Date] = d )
+VAR y = MAXX ( r, Dim_Date[PersianYear] )
+VAR doy = IF ( MAXX ( r, Dim_Date[PersianMonth] ) = 12 && MAXX ( r, Dim_Date[PersianDay] ) >= 29, 366, MAXX ( r, Dim_Date[PersianDayOfYear] ) )
+RETURN
+    CALCULATE ( [Sales Amount], REMOVEFILTERS ( Dim_Date ), Dim_Date[PersianYear] = y - 1, Dim_Date[PersianDayOfYear] <= doy )
+
+// رشد YTD نسبت به سال قبل | مقایسه فروش از ابتدای سال با همان بازه سال قبل. | format: 0.0%
+[Sales YTD YoY %] =
+DIVIDE ( [Sales YTD] - [Sales PY YTD], [Sales PY YTD] )
+
+// فروش ماه شمسی قبل | فروش ماه شمسی قبل (فقط وقتی یک ماه در زمینه است). | format: #,0
+[Sales PM] =
+IF (
+    HASONEVALUE ( Dim_Date[PersianMonthSeq] ),
+    CALCULATE ( [Sales Amount], REMOVEFILTERS ( Dim_Date ), Dim_Date[PersianMonthSeq] = MAX ( Dim_Date[PersianMonthSeq] ) - 1 )
+)
+
+// رشد ماه به ماه | (فروش ماه − فروش ماه قبل) ÷ فروش ماه قبل. | format: 0.0%
+[Sales MoM %] =
+DIVIDE ( [Sales Amount] - [Sales PM], [Sales PM] )
+
+
+// ==================== 03 تارگت و پیش‌بینی ====================
+// سطح تارگت استفاده‌شده | سطح تارگتی که با فیلترهای فعلی معتبر است. با فیلتر محصول، مشتری یا پروموشن (یا فروشنده+کانال با هم) خالی است. | format: -
+[Target Level Used] =
+VAR bySp = ISFILTERED ( Dim_Salesperson )
+VAR byCh = ISFILTERED ( Dim_SalesChannel )
+VAR byTeam = ISFILTERED ( Dim_SalesRegion[Team_Name] ) || ISFILTERED ( Dim_SalesRegion[Area_Name] ) || ISFILTERED ( Dim_SalesRegion[Sales_Region_Name] )
+VAR blocked = ISFILTERED ( Dim_Product ) || ISFILTERED ( Dim_Customer ) || ISFILTERED ( Dim_Promotion ) || ( bySp && byCh )
+RETURN
+    SWITCH (
+        TRUE (),
+        ISFILTERED ( Fact_SalesTarget[Target_Level] ) && HASONEVALUE ( Fact_SalesTarget[Target_Level] ), VALUES ( Fact_SalesTarget[Target_Level] ),
+        blocked, BLANK (),
+        bySp, "Salesperson",
+        byCh, "Channel",
+        byTeam, "Team",
+        "Region"
+    )
+
+// مبلغ تارگت | تارگت فقط روی یک Target_Level جمع می‌شود (از روی فیلترها خودکار انتخاب می‌شود). در سطح ماه/فصل/سال معتبر است. | format: #,0
+[Target Amount] =
+VAR lvl = [Target Level Used]
+RETURN
+    IF ( NOT ISBLANK ( lvl ), CALCULATE ( SUM ( Fact_SalesTarget[Target_Value] ), KEEPFILTERS ( Fact_SalesTarget[Target_Level] = lvl ) ) )
+
+// درصد تحقق تارگت | فروش ÷ تارگت. | format: 0.0%
+[Target Achievement %] =
+DIVIDE ( [Sales Amount], [Target Amount] )
+
+// انحراف از تارگت | فروش − تارگت. | format: #,0
+[Target Variance] =
+IF ( NOT ISBLANK ( [Target Amount] ), [Sales Amount] - [Target Amount] )
+
+// درصد فروشندگان موفق در تحقق تارگت | فروشندگانی که ≥۱۰۰٪ تارگت خود را محقق کرده‌اند ÷ فروشندگان دارای تارگت. | format: 0.0%
+[Salespeople Meeting Target %] =
+VAR sp = FILTER ( VALUES ( Dim_Salesperson[Salesperson_Key] ), Dim_Salesperson[Salesperson_Key] <> -1 && NOT ISBLANK ( [Target Amount] ) )
+RETURN
+    DIVIDE ( COUNTROWS ( FILTER ( sp, [Target Achievement %] >= 1 ) ) + 0, COUNTROWS ( sp ) )
+
+// مبلغ پیش‌بینی | پیش‌بینی کل شرکت؛ پیش‌فرض آخرین نسخه. با فیلتر منطقه/فروشنده/کانال/محصول/مشتری خالی است. | format: #,0
+[Forecast Amount] =
+VAR v = IF ( ISFILTERED ( Fact_SalesForecast[Forecast_Version] ), MAX ( Fact_SalesForecast[Forecast_Version] ),
+             CALCULATE ( MAX ( Fact_SalesForecast[Forecast_Version] ), REMOVEFILTERS ( Fact_SalesForecast ) ) )
+VAR blocked = ISFILTERED ( Dim_SalesRegion ) || ISFILTERED ( Dim_Salesperson ) || ISFILTERED ( Dim_SalesChannel ) || ISFILTERED ( Dim_Product ) || ISFILTERED ( Dim_Customer )
+RETURN
+    IF ( NOT blocked, CALCULATE ( SUM ( Fact_SalesForecast[Forecast_Amount] ), Fact_SalesForecast[Forecast_Version] = v ) )
+
+// دقت پیش‌بینی | ۱ − |فروش − پیش‌بینی| ÷ فروش. | format: 0.0%
+[Forecast Accuracy %] =
+IF ( NOT ISBLANK ( [Forecast Amount] ), 1 - DIVIDE ( ABS ( [Sales Amount] - [Forecast Amount] ), [Sales Amount] ) )
+
+// دقت پیش‌بینی ثبت‌شده | میانگین دقت ثبت‌شده در جدول پیش‌بینی (جمع‌پذیر نیست). | format: 0.0%
+[Forecast Accuracy % (Recorded)] =
+DIVIDE ( AVERAGE ( Fact_SalesForecast[Forecast_Accuracy_Percent] ), 100 )
+
+
+// ==================== 04 مشتری ====================
+// مشتریان خریدار | مشتریانی که در دوره حداقل یک فاکتور دارند. | format: #,0
+[Buying Customers] =
+DISTINCTCOUNT ( Fact_Invoice[Customer_Key] )
+
+// مشتریان فعال (۹۰ روز) | مشتریانی که در ۹۰ روز منتهی به آخرین روز انتخاب‌شده خرید داشته‌اند. | format: #,0
+[Active Customers (90d)] =
+VAR d = MAX ( Dim_Date[Date] )
+RETURN
+    CALCULATE ( [Buying Customers], DATESINPERIOD ( Dim_Date[Date], d, -90, DAY ) )
+
+// مشتریان تا این تاریخ | همه مشتریانی که تا آخرین روز انتخاب‌شده حداقل یک بار خرید کرده‌اند. | format: #,0
+[Customers To Date] =
+VAR d = MAX ( Dim_Date[Date] )
+RETURN
+    CALCULATE ( [Buying Customers], REMOVEFILTERS ( Dim_Date ), Dim_Date[Date] <= d )
+
+// مشتریان غیرفعال (۱۸۰ روز) | مشتریان قبلی که ۱۸۰ روز خرید نداشته‌اند (از دست رفته). | format: #,0
+[Inactive Customers (180d)] =
+VAR d = MAX ( Dim_Date[Date] )
+RETURN
+    [Customers To Date] - CALCULATE ( [Buying Customers], DATESINPERIOD ( Dim_Date[Date], d, -180, DAY ) )
+
+// درصد مشتریان فعال | فعال ۹۰ روزه ÷ کل مشتریان تا این تاریخ. | format: 0.0%
+[Active Customer %] =
+DIVIDE ( [Active Customers (90d)], [Customers To Date] )
+
+// مشتریان جدید | مشتریانی که اولین فاکتورشان در دوره است. | format: #,0
+[New Customers] =
+VAR mn = MIN ( Dim_Date[Date] )
+VAR mx = MAX ( Dim_Date[Date] )
+VAR c = ADDCOLUMNS ( VALUES ( Fact_Invoice[Customer_Key] ), "@first", CALCULATE ( MIN ( Fact_Invoice[Invoice_Date] ), REMOVEFILTERS ( Dim_Date ) ) )
+RETURN
+    COUNTROWS ( FILTER ( c, [@first] >= mn && [@first] <= mx ) )
+
+// نرخ تکرار خرید | مشتریان با ≥۲ فاکتور در دوره ÷ مشتریان خریدار. | format: 0.0%
+[Repeat Customer %] =
+DIVIDE (
+    COUNTROWS ( FILTER ( VALUES ( Fact_Invoice[Customer_Key] ), CALCULATE ( COUNTROWS ( Fact_Invoice ) ) >= 2 ) ),
+    [Buying Customers]
+)
+
+// میانگین دفعات خرید | تعداد فاکتور ÷ مشتریان خریدار. | format: #,0.0
+[Purchase Frequency] =
+DIVIDE ( [Invoice Count], [Buying Customers] )
+
+// درآمد به ازای هر مشتری | فروش ÷ مشتریان خریدار. | format: #,0
+[Revenue per Customer] =
+DIVIDE ( [Sales Amount], [Buying Customers] )
+
+// مشتریان ثبت‌شده در دوره | مشتریانی که تاریخ ثبت‌نامشان در دوره است. | format: #,0
+[Registered Customers] =
+VAR mn = MIN ( Dim_Date[Date] )
+VAR mx = MAX ( Dim_Date[Date] )
+RETURN
+    COUNTROWS ( FILTER ( Dim_Customer, Dim_Customer[Registration_Date] >= mn && Dim_Customer[Registration_Date] <= mx ) )
+
+
+// ==================== 05 وصول ====================
+// مبلغ وصول‌شده | جمع پرداخت‌های موفق (به تاریخ پرداخت). | format: #,0
+[Collected Amount] =
+CALCULATE ( SUM ( Fact_Payment[Amount] ), Fact_Payment[Payment_Status] = "Successful" )
+
+// تعداد پرداخت | همه تلاش‌های پرداخت (موفق و ناموفق). | format: #,0
+[Payment Count] =
+COUNTROWS ( Fact_Payment )
+
+// درصد پرداخت موفق | پرداخت موفق ÷ کل پرداخت‌ها. | format: 0.0%
+[Successful Payment %] =
+DIVIDE ( CALCULATE ( [Payment Count], Fact_Payment[Payment_Status] = "Successful" ), [Payment Count] )
+
+// مانده مطالبات | مبلغ فاکتور − پرداخت موفق آن (وضعیت در ۱۴۰۵/۰۸/۳۰؛ به تاریخ فاکتور). | format: #,0
+[Outstanding Amount] =
+SUM ( Fact_Invoice[Outstanding_Amount] )
+
+// مطالبات معوق | مانده فاکتورهای Overdue. | format: #,0
+[Overdue Amount] =
+CALCULATE ( [Outstanding Amount], Fact_Invoice[Invoice_Status] = "Overdue" )
+
+// درصد مطالبات معوق | معوق ÷ کل مانده. | format: 0.0%
+[Overdue %] =
+DIVIDE ( [Overdue Amount], [Outstanding Amount] )
+
+// نرخ وصول | پرداخت موفق فاکتورهای دوره ÷ مبلغ همان فاکتورها. | format: 0.0%
+[Collection Rate %] =
+DIVIDE ( SUM ( Fact_Invoice[Paid_Amount] ), [Sales Amount] )
+
+// دوره وصول مطالبات (روز) | مانده ÷ فروش × تعداد روزهای دوره. | format: #,0.0
+[DSO (days)] =
+DIVIDE ( [Outstanding Amount], [Sales Amount] ) * COUNTROWS ( Dim_Date )
+
+
+// ==================== 06 مرجوعی و کیفیت ====================
+// تعداد درخواست مرجوعی | تعداد درخواست‌های مرجوعی (به تاریخ درخواست). | format: #,0
+[Return Requests] =
+COUNTROWS ( Fact_Return )
+
+// مبلغ بازپرداخت | جمع مبلغ بازپرداخت. | format: #,0
+[Refund Amount] =
+SUM ( Fact_Return[Refund_Amount] )
+
+// تعداد کالای مرجوعی (تأییدشده) | جمع تعداد تأییدشده. | format: #,0
+[Returned Quantity] =
+SUM ( Fact_Return[Approved_Quantity] )
+
+// نرخ مرجوعی کالا | کالای مرجوعی تأییدشده ÷ کالای سفارش‌داده‌شده. | format: 0.0%
+[Return Rate (Qty) %] =
+DIVIDE ( [Returned Quantity], SUM ( Fact_SalesOrderLine[Quantity] ) )
+
+// درصد سفارش‌های دارای مرجوعی | سفارش‌های دارای درخواست مرجوعی ÷ کل سفارش‌ها. | format: 0.0%
+[Orders With Return %] =
+DIVIDE ( DISTINCTCOUNT ( Fact_Return[Sales_Order_ID] ), [Order Count] )
+
+// سهم بازپرداخت از فروش | بازپرداخت ÷ فروش. | format: 0.0%
+[Refund % of Sales] =
+DIVIDE ( [Refund Amount], [Sales Amount] )
+
+// تعداد بازخورد | تعداد بازخوردها. | format: #,0
+[Feedback Count] =
+COUNTROWS ( Fact_CustomerFeedback )
+
+// تعداد شکایت | بازخوردهای نوع Complaint. | format: #,0
+[Complaint Count] =
+CALCULATE ( [Feedback Count], Fact_CustomerFeedback[Feedback_Type] = "Complaint" )
+
+// نرخ حل شکایت | شکایت بسته‌شده ÷ کل شکایت. | format: 0.0%
+[Complaint Resolution %] =
+DIVIDE ( CALCULATE ( [Complaint Count], Fact_CustomerFeedback[Feedback_Status] = "Closed" ), [Complaint Count] )
+
+// نرخ رعایت SLA | بازخورد حل‌شده در SLA ÷ بازخورد بسته‌شده. | format: 0.0%
+[SLA Compliance %] =
+DIVIDE (
+    CALCULATE ( [Feedback Count], Fact_CustomerFeedback[SLA_Status] = "Met" ),
+    CALCULATE ( [Feedback Count], Fact_CustomerFeedback[SLA_Status] IN { "Met", "Breached" } )
+)
+
+// میانگین امتیاز رضایت | میانگین Rating (جمع‌پذیر نیست). | format: 0.00
+[Avg Rating] =
+AVERAGE ( Fact_CustomerFeedback[Rating] )
+
+// میانگین روز رسیدگی | میانگین فاصله ثبت تا حل بازخورد. | format: #,0.0
+[Avg Resolution Days] =
+AVERAGE ( Fact_CustomerFeedback[Resolution_Days] )
+
+
+// ==================== 07 قیف فروش ====================
+// تعداد سرنخ | سرنخ‌ها به تاریخ ایجاد. | format: #,0
+[Lead Count] =
+COUNTROWS ( Fact_Lead )
+
+// سرنخ تبدیل‌شده | سرنخ‌های با وضعیت Converted. | format: #,0
+[Converted Leads] =
+SUM ( Fact_Lead[Is_Converted] )
+
+// نرخ تبدیل سرنخ | سرنخ تبدیل‌شده ÷ کل سرنخ. | format: 0.0%
+[Lead Conversion %] =
+DIVIDE ( [Converted Leads], [Lead Count] )
+
+// تعداد فرصت فروش | فرصت‌ها به تاریخ ایجاد. | format: #,0
+[Opportunity Count] =
+COUNTROWS ( Fact_Opportunity )
+
+// فرصت برنده‌شده | فرصت‌های Won. | format: #,0
+[Won Opportunities] =
+SUM ( Fact_Opportunity[Is_Won] )
+
+// نرخ برد فرصت | Won ÷ (Won + Lost). | format: 0.0%
+[Win Rate %] =
+DIVIDE ( [Won Opportunities], SUM ( Fact_Opportunity[Is_Closed] ) )
+
+// ارزش Pipeline باز | ارزش مورد انتظار فرصت‌های باز. | format: #,0
+[Pipeline Value] =
+CALCULATE ( SUM ( Fact_Opportunity[Expected_Value] ), Fact_Opportunity[Opportunity_Status] = "Open" )
+
+// Pipeline وزنی | ارزش × احتمال فرصت‌های باز. | format: #,0
+[Weighted Pipeline] =
+SUMX (
+    FILTER ( Fact_Opportunity, Fact_Opportunity[Opportunity_Status] = "Open" ),
+    Fact_Opportunity[Expected_Value] * Fact_Opportunity[Probability] / 100
+)
+
+// تعداد پیشنهاد ارسال‌شده | فرصت‌هایی که پیشنهاد قیمت دارند. | format: #,0
+[Proposals Sent] =
+CALCULATE ( [Opportunity Count], Fact_Opportunity[Proposal_Status] IN { "Sent", "Accepted", "Rejected" } )
+
+// تعداد قرارداد | قراردادها به تاریخ شروع. | format: #,0
+[Contract Count] =
+COUNTROWS ( Fact_Contract )
+
+// ارزش قراردادها | جمع مبلغ قراردادها. | format: #,0
+[Contract Amount] =
+SUM ( Fact_Contract[Contract_Amount] )
+
+// میانگین ارزش قرارداد | ارزش قرارداد ÷ تعداد. | format: #,0
+[Avg Contract Value] =
+DIVIDE ( [Contract Amount], [Contract Count] )
+
+// میانگین روز تا قرارداد | از تاریخ فرصت تا شروع قرارداد. | format: #,0.0
+[Avg Days To Contract] =
+AVERAGE ( Fact_Contract[Days_Opportunity_To_Contract] )
+
+// تعداد تعامل | تعاملات با مشتری. | format: #,0
+[Interaction Count] =
+COUNTROWS ( Fact_CustomerInteraction )
+
+// تماس موثر | تماس‌های بیش از ۲ دقیقه. | format: #,0
+[Effective Calls] =
+CALCULATE (
+    [Interaction Count],
+    Fact_CustomerInteraction[Interaction_Type] = "Call",
+    Fact_CustomerInteraction[Interaction_Duration_Minutes] > 2
+)
+
+// میانگین تعامل هر مشتری | تعامل ÷ مشتریان دارای تعامل. | format: #,0.0
+[Interactions per Customer] =
+DIVIDE ( [Interaction Count], DISTINCTCOUNT ( Fact_CustomerInteraction[Customer_Key] ) )
+
+
+// ==================== 08 فروشنده ====================
+// کارمزد | جمع کارمزد فروشندگان. | format: #,0
+[Commission Amount] =
+SUM ( Fact_Commission[Commission_Amount] )
+
+// پایه کارمزد | جمع پایه محاسبه کارمزد. | format: #,0
+[Commission Base] =
+SUM ( Fact_Commission[Commission_Base_Amount] )
+
+// نرخ میانگین کارمزد | کارمزد ÷ پایه (نرخ‌ها جمع زده نمی‌شوند). | format: 0.00%
+[Avg Commission Rate %] =
+DIVIDE ( [Commission Amount], [Commission Base] )
+
+
+// ==================== 09 بازاریابی ====================
+// بودجه کمپین | بودجه تخصیص‌یافته (به تاریخ تصویب). | format: #,0
+[Campaign Budget] =
+SUM ( Fact_CampaignBudget[Total_Allocated_Amount] )
+
+// هزینه واقعی کمپین | هزینه ثبت‌شده (به تاریخ هزینه). | format: #,0
+[Campaign Spend] =
+SUM ( Fact_CampaignCost[Actual_Spent] )
+
+// درصد مصرف بودجه | هزینه ÷ بودجه. برای هر کمپین (نه هر روز) معنا دارد. | format: 0.0%
+[Budget Utilization %] =
+DIVIDE ( [Campaign Spend], [Campaign Budget] )
+
+// انحراف از بودجه | هزینه − بودجه. | format: #,0
+[Budget Variance] =
+[Campaign Spend] - [Campaign Budget]
+
+// فروش با پروموشن | فروش فاکتورهایی که سفارششان پروموشن دارد. تنها مسیر اتصال بازاریابی به فروش. | format: #,0
+[Promotion Sales] =
+CALCULATE ( [Sales Amount], Dim_Promotion[Has_Promotion] = TRUE () )
+
+// سهم فروش پروموشن | فروش پروموشن ÷ کل فروش. | format: 0.0%
+[Promotion Sales Share %] =
+DIVIDE ( [Promotion Sales], [Sales Amount] )
+
+// فروش پروموشن‌های کمپین | فروش پروموشن‌های کمپین‌های انتخاب‌شده (مسیر پروموشن ← کمپین). | format: #,0
+[Campaign Promotion Sales] =
+CALCULATE ( [Sales Amount], TREATAS ( VALUES ( Dim_Campaign[Campaign_Key] ), Dim_Promotion[Campaign_Key] ) )
+
+// بازده پروموشن به هزینه | فروش پروموشن ÷ هزینه کمپین. | format: 0.00
+[Promotion Return on Spend] =
+DIVIDE ( [Campaign Promotion Sales], [Campaign Spend] )
+
+// تعداد نمایش | متریک Impressions. | format: #,0
+[Impressions] =
+CALCULATE ( SUM ( Fact_CampaignResult[Metric_Value] ), Fact_CampaignResult[Metric_Name] = "Impressions" )
+
+// مخاطب دیده‌شده | متریک Audience_Reached. | format: #,0
+[Audience Reached] =
+CALCULATE ( SUM ( Fact_CampaignResult[Metric_Value] ), Fact_CampaignResult[Metric_Name] = "Audience_Reached" )
+
+// تبدیل | متریک Conversions. | format: #,0
+[Conversions] =
+CALCULATE ( SUM ( Fact_CampaignResult[Metric_Value] ), Fact_CampaignResult[Metric_Name] = "Conversions" )
+
+// مشتری جدید از کمپین | متریک New_Customers. | format: #,0
+[Campaign New Customers] =
+CALCULATE ( SUM ( Fact_CampaignResult[Metric_Value] ), Fact_CampaignResult[Metric_Name] = "New_Customers" )
+
+// درآمد منتسب به کمپین | متریک Attributed_Revenue. | format: #,0
+[Attributed Revenue] =
+CALCULATE ( SUM ( Fact_CampaignResult[Metric_Value] ), Fact_CampaignResult[Metric_Name] = "Attributed_Revenue" )
+
+// آگاهی از برند | میانگین متریک Brand_Awareness_Pct. | format: 0.0%
+[Brand Awareness %] =
+DIVIDE ( CALCULATE ( AVERAGE ( Fact_CampaignResult[Metric_Value] ), Fact_CampaignResult[Metric_Name] = "Brand_Awareness_Pct" ), 100 )
+
+// نرخ تبدیل کمپین | تبدیل ÷ مخاطب دیده‌شده. | format: 0.0%
+[Campaign Conversion %] =
+DIVIDE ( [Conversions], [Audience Reached] )
+
+// بازگشت سرمایه کمپین | (درآمد منتسب − هزینه) ÷ هزینه. بر پایه درآمد، نه سود (بهای تمام‌شده در داده نیست). | format: 0.0%
+[Campaign ROI %] =
+DIVIDE ( [Attributed Revenue] - [Campaign Spend], [Campaign Spend] )
+
+// هزینه جذب هر مشتری | هزینه کمپین ÷ مشتری جدید کمپین. | format: #,0
+[Cost per Acquired Customer] =
+DIVIDE ( [Campaign Spend], [Campaign New Customers] )
+
+// هزینه فعالیت‌های برند | جمع هزینه فعالیت‌های برند (به تاریخ شروع). | format: #,0
+[Brand Activity Cost] =
+SUM ( Fact_BrandActivity[Activity_Cost] )
+
+// میانگین قیمت ما در بازار | میانگین قیمت مشاهده‌شده محصولات ما. | format: #,0
+[Our Avg Market Price] =
+CALCULATE ( AVERAGE ( Fact_MarketPrice[Price_Value] ), Fact_MarketPrice[Is_Own_Product] = TRUE () )
+
+// میانگین قیمت رقبا | میانگین قیمت محصولات رقبا. | format: #,0
+[Competitor Avg Price] =
+CALCULATE ( AVERAGE ( Fact_MarketPrice[Price_Value] ), Fact_MarketPrice[Is_Own_Product] = FALSE () )
+
+// شاخص قیمت نسبت به رقبا | قیمت ما ÷ قیمت رقبا (بازار و دوره یکسان). با فیلتر محصول ما خالی است چون محصول رقیب به محصول ما وصل نیست. | format: 0.0%
+[Price Index vs Competitors] =
+DIVIDE ( [Our Avg Market Price], [Competitor Avg Price] )
+
+// شکاف قیمت با رقبا | قیمت ما − قیمت رقبا. | format: #,0
+[Price Gap vs Competitors] =
+[Our Avg Market Price] - [Competitor Avg Price]
+
+// میانگین قیمت فهرست | میانگین قیمت استاندارد SKUها (جمع‌پذیر نیست). | format: #,0
+[Avg List Price] =
+AVERAGE ( Fact_ProductPrice[Unit_Price] )
+
+// تعداد تحقیقات بازار | پروژه‌های تحقیق (به تاریخ شروع). | format: #,0
+[Research Count] =
+COUNTROWS ( Fact_MarketResearch )
+
+// درصد تحقیقات تکمیل‌شده | تحقیق تکمیل‌شده ÷ کل. | format: 0.0%
+[Research Completion %] =
+DIVIDE ( CALCULATE ( [Research Count], Fact_MarketResearch[Research_Status] = "Completed" ), [Research Count] )
+
+// هزینه تحقیقات | جمع هزینه تحقیقات. | format: #,0
+[Research Cost] =
+SUM ( Fact_MarketResearch[Research_Cost] )
+
+// تعداد نظرسنجی | نظرسنجی‌ها. | format: #,0
+[Survey Count] =
+COUNTROWS ( Fact_MarketSurvey )
+
+// حجم نمونه نظرسنجی | جمع حجم نمونه. | format: #,0
+[Survey Sample Size] =
+SUM ( Fact_MarketSurvey[Sample_Size] )
+
+// تعداد رقبا | تعداد رقبای ثبت‌شده. | format: #,0
+[Competitor Count] =
+COUNTROWS ( Dim_Competitor )
+
